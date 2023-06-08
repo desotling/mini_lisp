@@ -19,6 +19,6 @@ ValuePtr print(const std::vector<ValuePtr>& params) {
     return std::make_shared<NilValue>();
 }
 
-const std::unordered_map<std::string, BuiltinFuncType*> BUILTINS {
+const std::unordered_map<std::string, BuiltinFuncType*> BUILTIN_FUNCS {
     {"+", add},
     {"print", print}};

@@ -11,7 +11,7 @@
 
 EvalEnv::EvalEnv(){
     for(auto&&[name, func] : BUILTIN_FUNCS){
-        symbolPair.insert_or_assign(name, std::make_shared<BuiltinProcValue>(&func));
+        symbolPair.insert_or_assign(name, std::make_shared<BuiltinProcValue>(func));
     }
 }
 
@@ -25,7 +25,7 @@ ValuePtr EvalEnv::eval(ValuePtr expr) {
         auto expr_pair = static_cast<PairValue&>(*expr);
         if (auto name = expr_pair.getleft()->asSymbol()) {
             if (auto it = SPECIAL_FORMS.find(*name); it != SPECIAL_FORMS.end()) {//特殊形式
-                return it->second(expr_pair.getleft()->toVector(), *this);
+                return it->second(expr_pair.getright()->toVector(), *this);
             } else {//内置过程
                 ValuePtr proc = this->eval(v[0]);
                 auto value = static_cast<PairValue&>(*expr);

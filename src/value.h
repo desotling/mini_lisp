@@ -10,6 +10,7 @@
 
 class Value;
 using ValuePtr = std::shared_ptr<Value>;
+using BuiltinFuncType = ValuePtr(const std::vector<ValuePtr>&);
 
 class Value{
 public:
@@ -18,9 +19,13 @@ public:
     bool isSelfEvaluating();
     bool isPair();
     bool isNumber();
-    bool isBoolean() const;
-    bool isTrue() const;
-    virtual double asNumber() const;
+    bool isString();
+    bool isBoolean();
+    bool isSymbol();
+    bool isList();
+    bool isProcedure();
+    bool isTrue();
+    double asNumber();
     std::vector<ValuePtr> toVector();
     std::optional<std::string> asSymbol();
     virtual std::string toString() const=0;
@@ -73,20 +78,17 @@ class PairValue: public Value{
 public:
     PairValue(){};
     PairValue(ValuePtr a, ValuePtr b):left{a},right{b}{};
-    PairValue(const PairValue& v):left{v.left},right{v.right}{};
+    PairValue(const PairValue& v):left{std::move(v.left)},right{std::move(v.right)}{};
     std::string toString() const override;
     std::string getit() const;
     ValuePtr getleft() const;
     ValuePtr getright() const;
 };
 
-using BuiltinFuncType = ValuePtr(const std::vector<ValuePtr>&);
-
 class BuiltinProcValue : public Value {
     BuiltinFuncType* func;
 public:
-    BuiltinProcValue(){};
-    BuiltinProcValue(BuiltinFuncType* func):func{func}{};
+    BuiltinProcValue(BuiltinFuncType* func):func{std::move(func)}{};
     BuiltinFuncType* getfunc(){return func;};
     std::string toString() const override;
 };

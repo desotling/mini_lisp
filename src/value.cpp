@@ -36,25 +36,53 @@ bool Value::isNumber() {
     else return false;
 }
 
-bool Value::isBoolean() const {
+bool Value::isString() {
+    if(typeid(*this) == typeid(StringValue)) {
+        return true;
+     }
+    else return false;
+}
+
+bool Value::isSymbol() {
+    if(typeid(*this) == typeid(SymbolValue)) {
+        return true;
+     }
+    else return false;
+}
+
+bool Value::isBoolean() {
     return typeid(*this) == typeid(BooleanValue);
 }
 
+bool Value::isList() {
+    auto current = this;
+    while (!current->isNil()) {
+        if (!current->isPair()) {
+            return false;
+        }
+        auto& tmp = static_cast<const PairValue&>(*current);
+        current = tmp.getright().get();
+    }
+    return true;
+}
 
-bool Value::isTrue() const {
+bool Value::isProcedure(){
+    return typeid(*this) == typeid(BuiltinProcValue);
+}
+
+bool Value::isTrue() {
     if (!isBoolean()) return true;
     return static_cast<const BooleanValue*>(this)->getValue();
 }
 
-double Value::asNumber() const {
+double Value::asNumber() {
     return static_cast<const NumericValue*>(this)->getValue();
 }
 
 std::vector<ValuePtr> Value::toVector() {
-    if(this->isNil()){
+    if(this->isNil()) {
         return {};
-    }
-    else if(this->isPair()){
+    } else if(typeid(*this) == typeid(PairValue)) {
         std::vector<ValuePtr> c;
         auto& v = static_cast<const PairValue&>(*this);
         c.push_back(v.getleft());
@@ -103,10 +131,6 @@ std::string NumericValue::toString() const {
     else{
         return to_string(value);
     }
-}
-
-double NumericValue::asNumber() const {
-    return this->value;
 }
 
 std::string StringValue::toString() const {
