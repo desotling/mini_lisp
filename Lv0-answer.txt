@@ -1,0 +1,12 @@
+1.为什么 Tokenizer::tokenize 接受的形参类型是 const std::string& 而不是 std::string？可不可以用 std::string？
+2.为什么使用 TokenPtr，也即 std::unique_ptr<Token>？如果改用 Token*，会有什么影响？
+3.main 函数中 std::cout << *token 是如何实现的？
+4.当词法分析出现错误时，程序是如何进行错误处理的？
+5.* 使用 std::deque<TokenPtr> 相比 std::vector<TokenPtr> 的好处是什么？
+
+1.为了避免有某些代码随便乱改这个值，就用了只读，也避免复制过程，使用引用
+2.为了方便管理，让指针与其指向的内容一一对应,指针对其对象具有所有权，避免混乱，可以使用std::make_unique来构造，自动析构，具有移动语义
+  如果改用Token*,则每new一次都要析构一次，要出错的
+3.使用运算符重载，在token.cpp文件之中
+4.使用 throw SyntaxError 来报错
+5.deque可以对头端进行增删，这与lisp语言列表这一结构相契合，比尾端操作的vector好
