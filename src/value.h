@@ -97,8 +97,19 @@ class LambdaValue : public Value {
 private:
     std::vector<std::string> params;
     std::vector<ValuePtr> body;
-    // [...]
 public:
+    LambdaValue(ValuePtr ptr, std::vector<ValuePtr> b) {
+        std::vector<ValuePtr> temp = ptr->toVector();
+        for(auto i : temp) {
+            if(auto name = i->asSymbol()) {
+                params.push_back(*name);
+            } else {
+                throw LispError("Invalid Variable.");
+            }
+        }
+        body = b;
+    }
     std::string toString() const override; // 如前所述，返回 #<procedure> 即可
 };
+
 #endif

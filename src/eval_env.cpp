@@ -65,5 +65,8 @@ ValuePtr EvalEnv::apply(ValuePtr proc, std::vector<ValuePtr> args) {
     }
 }
 
+void EvalEnv::addVariable(std::string name, ValuePtr expr) {
+    symbolPair.insert_or_assign(name, expr);
+}
 
 
