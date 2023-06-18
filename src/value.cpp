@@ -1,5 +1,6 @@
 #include "./value.h"
 #include "./error.h"
+#include "./eval_env.h"
 #include <typeinfo>
 #include <string>
 #include <iomanip>
@@ -67,7 +68,11 @@ bool Value::isList() {
 }
 
 bool Value::isProcedure(){
-    return typeid(*this) == typeid(BuiltinProcValue);
+    if(typeid(*this) == typeid(BuiltinProcValue)||typeid(*this) == typeid(LambdaValue)){
+        return true;
+    } else {
+        return false;
+    }
 }
 
 bool Value::isTrue() {
@@ -176,4 +181,14 @@ std::string BuiltinProcValue::toString() const {
 
 std::string LambdaValue::toString() const {
     return "#<procedure>";
+}
+
+ValuePtr LambdaValue::apply(const std::vector<ValuePtr>& args) {
+    std::cout << 2 << std::endl;
+    auto childEnv = env->createChild(params, args);
+    auto result = childEnv->eval(body[0]);
+    for (int i = 1; i < body.size(); i++) {
+        result = childEnv->eval(body[i]);
+    }
+    return result;
 }

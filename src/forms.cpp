@@ -16,23 +16,26 @@ std::vector<ValuePtr> cutFirst(const std::vector<ValuePtr>& args) {
 
 ValuePtr defineForm(const std::vector<ValuePtr>& args, EvalEnv& env) {
     if (auto name = args[0]->asSymbol()) {
-        env.symbolPair.insert_or_assign(*name, args[1]);
-        return ValuePtr(new NilValue());
-    } else if(typeid(*args[0] == typeid(PairValue))) {
+        env.defineBinding(*name, args[1]);
+        std::cout << 4 << std::endl;
+        return std::make_shared<NilValue>();
+    } else if(typeid(*args[0]) == typeid(PairValue)) {
+        std::cout << 3 << std::endl;
         auto expr = static_cast<PairValue&>(*args[0]);
         if(auto name = expr.getleft()->asSymbol()){
-            auto temp = ValuePtr(new LambdaValue(expr.getleft(), cutFirst(args)));
-            env.addVariable(*name, temp);
-            return ValuePtr(new NilValue());
+            auto temp = ValuePtr(new LambdaValue(expr.getright(), cutFirst(args), env.shared_from_this()));
+            env.defineBinding(*name, temp);
+            return std::make_shared<NilValue>();
         }
-        return ValuePtr(new NilValue());
+        return std::make_shared<NilValue>();
     } else {
         throw LispError("Unimplemented");
     }
 }
 
 ValuePtr lambdaForm(const std::vector<ValuePtr>& args, EvalEnv& env) {
-    return ValuePtr(new LambdaValue((args[0]), cutFirst(args)));
+    std::cout << 8 << std::endl;
+    return ValuePtr(new LambdaValue((args[0]), cutFirst(args), env.shared_from_this()));
 }
 
 ValuePtr quoteForm(const std::vector<ValuePtr>& args, EvalEnv& env) {

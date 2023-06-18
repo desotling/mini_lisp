@@ -6,11 +6,14 @@
 #include <memory>
 #include <ostream>
 #include <deque>
+#include <iostream>
 #include <vector>
+#include ".\error.h"
 
 class Value;
 using ValuePtr = std::shared_ptr<Value>;
 using BuiltinFuncType = ValuePtr(const std::vector<ValuePtr>&);
+class EvalEnv;
 
 class Value{
 public:
@@ -97,8 +100,11 @@ class LambdaValue : public Value {
 private:
     std::vector<std::string> params;
     std::vector<ValuePtr> body;
+    std::shared_ptr<EvalEnv> env;
 public:
-    LambdaValue(ValuePtr ptr, std::vector<ValuePtr> b) {
+    LambdaValue(const std::vector<std::string>& params, std::vector<ValuePtr> body, std::shared_ptr<EvalEnv> env) : params{params}, body{std::move(body)}, env{std::move(env)} {};
+    LambdaValue(ValuePtr ptr, std::vector<ValuePtr> body, std::shared_ptr<EvalEnv> env) : body{std::move(body)}, env{std::move(env)} {
+        std::cout << 1 << std::endl;
         std::vector<ValuePtr> temp = ptr->toVector();
         for(auto i : temp) {
             if(auto name = i->asSymbol()) {
@@ -107,9 +113,9 @@ public:
                 throw LispError("Invalid Variable.");
             }
         }
-        body = b;
-    }
+    };
     std::string toString() const override; // 如前所述，返回 #<procedure> 即可
+    ValuePtr apply(const std::vector<ValuePtr>& args);
 };
 
 #endif
